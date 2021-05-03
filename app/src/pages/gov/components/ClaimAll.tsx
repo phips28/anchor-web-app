@@ -23,7 +23,6 @@ import { useClaimableAncUstLp } from 'pages/gov/queries/claimableAncUstLp';
 import { useClaimableUstBorrow } from 'pages/gov/queries/claimableUstBorrow';
 import { allClaimOptions } from 'pages/gov/transactions/allClaimOptions';
 import React, { useCallback, useMemo } from 'react';
-import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
 export interface ClaimAllComponentProps {
@@ -39,8 +38,6 @@ function ClaimAllComponentBase({ className }: ClaimAllComponentProps) {
   const { fixedGas } = useConstants();
 
   const [claim, claimResult] = useOperation(allClaimOptions, {});
-
-  const history = useHistory();
 
   // ---------------------------------------------
   // queries
@@ -114,8 +111,7 @@ function ClaimAllComponentBase({ className }: ClaimAllComponentProps) {
     claimResult?.status === 'done' ||
     claimResult?.status === 'fault'
   ) {
-    const onExit =
-      claimResult.status === 'done' ? () => history.push('/gov') : undefined;
+    const onExit = undefined;
 
     return (
       <Section className={className}>
