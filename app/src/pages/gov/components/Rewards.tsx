@@ -34,9 +34,10 @@ import styled from 'styled-components';
 
 export interface RewardsProps {
   className?: string;
+  hideClaimAllBtn?: boolean;
 }
 
-export function RewardsBase({ className }: RewardsProps) {
+export function RewardsBase({ className, hideClaimAllBtn }: RewardsProps) {
   // ---------------------------------------------
   // queries
   // ---------------------------------------------
@@ -155,11 +156,13 @@ export function RewardsBase({ className }: RewardsProps) {
         <div>
           <h2>Rewards</h2>
         </div>
-        <div>
-          <ActionButton component={Link} to={`/${govPathname}/claim/all`}>
-            Claim All Rewards
-          </ActionButton>
-        </div>
+        {!hideClaimAllBtn && (
+          <div>
+            <ActionButton component={Link} to={`/${govPathname}/claim/all`}>
+              Claim All Rewards
+            </ActionButton>
+          </div>
+        )}
       </SubHeader>
 
       <Section>

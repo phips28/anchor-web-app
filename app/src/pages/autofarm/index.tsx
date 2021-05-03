@@ -1,27 +1,59 @@
 import { EventBusProvider } from '@terra-dev/event-bus';
-import {
-  rulerLightColor,
-  rulerShadowColor,
-} from '@terra-dev/styled-neumorphism';
 import { PaddedLayout } from 'components/layouts/PaddedLayout';
 import { screen } from 'env';
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Rewards } from '../gov/components/Rewards';
+import { ClaimAllComponent } from '../gov/components/ClaimAll';
+import { AncUstLpStake } from '../gov/components/AncUstLpStake';
+import { Section } from '@terra-dev/neumorphism-ui/components/Section';
+import { AncUstLpProvide } from '../gov/components/AncUstLpProvide';
 
 export interface AutoFarmProps {
   className?: string;
 }
 
 function AutoFarmBase({ className }: AutoFarmProps) {
+  const [currentStep /*, setCurrentStep*/] = useState(0);
+  const [farming /*, setFarming*/] = useState(false);
+
   return (
-    <PaddedLayout className={className}>
-      <section className="grid">
-        <EventBusProvider>
-          <Rewards className="rewards" />
-        </EventBusProvider>
-      </section>
-    </PaddedLayout>
+    <EventBusProvider>
+      <PaddedLayout className={className}>
+        <div className="description">
+          Auto Farming is deactivated at the moment, click it manually.
+          <br />
+          But this page already reduces time wasted with farming. 🚀
+        </div>
+        <hr />
+
+        <section className="grid">
+          <ClaimAllComponent
+            className={`${
+              farming && currentStep === 0 ? 'active' : ''
+            } claim-all`}
+          />
+
+          {/* Provide Liquidity */}
+          <Section className={farming && currentStep === 1 ? 'active' : ''}>
+            <div className="form">
+              <h2>Provide Liquidity</h2>
+              <AncUstLpProvide />
+            </div>
+          </Section>
+
+          {/* Stake LP */}
+          <Section className={farming && currentStep === 2 ? 'active' : ''}>
+            <div className="form">
+              <h2>Stake LP</h2>
+              <AncUstLpStake />
+            </div>
+          </Section>
+        </section>
+
+        <Rewards className="rewards" hideClaimAllBtn />
+      </PaddedLayout>
+    </EventBusProvider>
   );
 }
 
@@ -41,155 +73,72 @@ export const AutoFarm = styled(AutoFarmBase)`
     margin: 30px 0;
   }
 
+  .active {
+    border: 1px solid green;
+
+    .NeuSection-content {
+      padding: 59px;
+    }
+  }
+
   .decimal-point {
     color: ${({ theme }) => theme.dimTextColor};
   }
 
-  .total-deposit {
-    .amount {
-      font-size: 50px;
-      font-weight: 200;
-      letter-spacing: -1.5px;
-      color: ${({ theme }) => theme.textColor};
-    }
-
-    .total-deposit-buttons {
-      margin-top: 72px;
-    }
-  }
-
-  .interest {
-    .apy {
+  .form {
+    h2 {
+      font-size: 27px;
       text-align: center;
+      font-weight: 300;
+      margin-bottom: 50px;
+    }
 
-      .name {
-        margin-bottom: 5px;
+    .description {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      font-size: 16px;
+      color: ${({ theme }) => theme.dimTextColor};
+
+      > :last-child {
+        font-size: 12px;
       }
 
-      .value {
-        font-size: 50px;
-        font-weight: 300;
-        color: ${({ theme }) => theme.colors.positive};
-        margin-bottom: 50px;
-      }
-
-      figure {
-        width: 100%;
-        height: 200px;
-      }
+      margin-bottom: 12px;
     }
 
-    .earn {
-      margin-top: 33px;
+    .amount {
+      width: 100%;
 
-      .amount {
-        margin-top: 80px;
-
-        text-align: center;
-        font-size: 40px;
-        font-weight: 300;
-
-        p {
-          margin-top: 10px;
-          font-size: 13px;
-          font-weight: 500;
-        }
-      }
-    }
-  }
-
-  .transaction-history {
-    position: relative;
-
-    ul.list {
-      list-style: none;
-      padding: 0;
-
-      li {
-        padding: 20px 0;
-
-        .amount {
-          font-size: 18px;
-          color: ${({ theme }) => theme.textColor};
-        }
-
-        .detail {
-          margin-top: 5px;
-
-          font-size: 14px;
-          color: ${({ theme }) => theme.dimTextColor};
-
-          a {
-            color: currentColor;
-          }
-        }
-
-        &:not(:last-child) {
-          border-bottom: 1px solid
-            ${({ theme }) =>
-              rulerShadowColor({
-                intensity: theme.intensity,
-                color: theme.backgroundColor,
-              })};
-        }
-
-        &:not(:first-child) {
-          border-top: 1px solid
-            ${({ theme }) =>
-              rulerLightColor({
-                intensity: theme.intensity,
-                color: theme.backgroundColor,
-              })};
-        }
-      }
-    }
-  }
-
-  // ---------------------------------------------
-  // layout
-  // ---------------------------------------------
-  .total-deposit {
-    h2 {
-      margin-bottom: 15px;
+      margin-bottom: 5px;
     }
 
-    .total-deposit-buttons {
-      display: grid;
-      grid-template-columns: repeat(2, 142px);
-      justify-content: end;
-      grid-gap: 20px;
-    }
-  }
+    .wallet {
+      display: flex;
+      justify-content: space-between;
 
-  .interest {
-    h2 {
-      margin-bottom: 40px;
-    }
-  }
+      font-size: 12px;
+      color: ${({ theme }) => theme.dimTextColor};
 
-  .transaction-history {
-    h2 {
-      margin-bottom: 16px;
-    }
-
-    hr {
-      margin: 0 0 10px 0;
-    }
-
-    ul.list {
-      li {
-        .detail {
-          display: flex;
-          justify-content: space-between;
-        }
+      &[aria-invalid='true'] {
+        color: ${({ theme }) => theme.colors.negative};
       }
     }
 
-    ul.pagination {
-      position: absolute;
-      left: 50%;
-      bottom: 20px;
-      transform: translateX(-50%);
+    .separator {
+      margin: 10px 0 0 0;
+    }
+
+    .receipt {
+      margin-top: 30px;
+    }
+
+    .submit {
+      margin-top: 40px;
+
+      width: 100%;
+      height: 60px;
     }
   }
 
@@ -199,7 +148,7 @@ export const AutoFarm = styled(AutoFarmBase)`
       display: grid;
 
       grid-template-columns: 1fr 1fr 460px;
-      grid-template-rows: auto 425px;
+      grid-template-rows: auto;
       grid-gap: 40px;
 
       .NeuSection-root {
@@ -225,62 +174,6 @@ export const AutoFarm = styled(AutoFarmBase)`
     .interest {
       .NeuSection-content {
         padding: 60px 40px;
-      }
-    }
-  }
-
-  // under pc
-  @media (max-width: ${screen.pc.max}px) {
-    .transaction-history {
-      height: 430px;
-    }
-  }
-
-  // under tablet
-  @media (max-width: ${screen.tablet.max}px) {
-    .transaction-history {
-      height: 410px;
-    }
-  }
-
-  // mobile
-  @media (max-width: ${screen.mobile.max}px) {
-    .decimal-point {
-      display: none;
-    }
-
-    .total-deposit {
-      h2 {
-        margin-bottom: 10px;
-      }
-
-      .amount {
-        font-size: 40px;
-      }
-
-      .total-deposit-buttons {
-        margin-top: 40px;
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-gap: 15px;
-      }
-    }
-
-    .transaction-history {
-      height: 440px;
-
-      ul.list {
-        li {
-          .detail {
-            flex-direction: column;
-
-            margin-left: 13px;
-
-            time {
-              margin-top: 5px;
-            }
-          }
-        }
       }
     }
   }
