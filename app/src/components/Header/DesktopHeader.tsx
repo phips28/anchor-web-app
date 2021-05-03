@@ -55,6 +55,7 @@ function DesktopHeaderBase({ className }: DesktopHeaderProps) {
         <NavMenu to="/borrow" title="BORROW" docsTo={links.borrow} />
         <NavMenu to="/bond" title="BOND" docsTo={links.bond} />
         <NavMenu to={`/${govPathname}`} title="GOVERN" docsTo={links.gov} />
+        <NavMenu to="/autofarm" title="AUTO FARM" docsTo={links.gov} />
       </nav>
 
       <section className="wallet">
