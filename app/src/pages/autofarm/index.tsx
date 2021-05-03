@@ -77,7 +77,7 @@ export const AutoFarm = styled(AutoFarmBase)`
     border: 1px solid green;
 
     .NeuSection-content {
-      padding: 59px;
+      padding: 39px;
     }
   }
 
@@ -154,26 +154,8 @@ export const AutoFarm = styled(AutoFarmBase)`
       .NeuSection-root {
         margin: 0;
       }
-
-      .total-deposit {
-        grid-column: 1/3;
-        grid-row: 1;
-      }
-
-      .interest {
-        grid-column: 3;
-        grid-row: 1/3;
-      }
-
-      .transaction-history {
-        grid-column: 1/3;
-        grid-row: 2/3;
-      }
-    }
-
-    .interest {
       .NeuSection-content {
-        padding: 60px 40px;
+        padding: 40px;
       }
     }
   }
