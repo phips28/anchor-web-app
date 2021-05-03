@@ -37,7 +37,7 @@ function AutoFarmBase({ className }: AutoFarmProps) {
           {/* Provide Liquidity */}
           <Section className={farming && currentStep === 1 ? 'active' : ''}>
             <div className="form">
-              <h2>Provide Liquidity</h2>
+              <h2>2. Provide Liquidity</h2>
               <AncUstLpProvide />
             </div>
           </Section>
@@ -45,7 +45,7 @@ function AutoFarmBase({ className }: AutoFarmProps) {
           {/* Stake LP */}
           <Section className={farming && currentStep === 2 ? 'active' : ''}>
             <div className="form">
-              <h2>Stake LP</h2>
+              <h2>3. Stake LP</h2>
               <AncUstLpStake />
             </div>
           </Section>

@@ -122,7 +122,7 @@ function ClaimAllComponentBase({ className }: ClaimAllComponentProps) {
 
   return (
     <Section className={className}>
-      <h1>Claim All Rewards</h1>
+      <h1>1. Claim All Rewards</h1>
 
       {!!invalidTxFee && <MessageBox>{invalidTxFee}</MessageBox>}
 
