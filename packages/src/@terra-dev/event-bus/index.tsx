@@ -15,25 +15,42 @@ export interface EventBusProviderProps {
 }
 
 export interface EventBus {
-  dispatch: (eventType: string) => void;
-  on: (eventType: string, listener: () => void) => () => void;
+  dispatch: (
+    eventType: string,
+    callback?: (params: { [key: string]: any }) => void,
+  ) => void;
+  on: (
+    eventType: string,
+    listener: (callback?: (params: { [key: string]: any }) => void) => void,
+  ) => () => void;
 }
 
 // @ts-ignore
 const EventBusContext: Context<EventBus> = createContext<EventBus>();
 
 export function EventBusProvider({ children }: EventBusProviderProps) {
-  const listeners = useRef<Map<string, Set<() => void>>>(new Map());
+  const listeners = useRef<
+    Map<
+      string,
+      Set<(callback?: (params: { [key: string]: any }) => void) => void>
+    >
+  >(new Map());
 
-  const dispatch = useCallback((eventType: string) => {
-    const eventListeners = listeners.current.get(eventType);
+  const dispatch = useCallback(
+    (
+      eventType: string,
+      callback?: (params: { [key: string]: any }) => void,
+    ) => {
+      const eventListeners = listeners.current.get(eventType);
 
-    if (eventListeners) {
-      for (const listener of eventListeners) {
-        listener();
+      if (eventListeners) {
+        for (const listener of eventListeners) {
+          listener(callback);
+        }
       }
-    }
-  }, []);
+    },
+    [],
+  );
 
   const on = useCallback((eventType: string, listener: () => void) => {
     if (!listeners.current.has(eventType)) {
@@ -70,7 +87,10 @@ export function useEventBus(): EventBus {
   return useContext(EventBusContext);
 }
 
-export function useEventBusListener(eventType: string, listener: () => void) {
+export function useEventBusListener(
+  eventType: string,
+  listener: (callback?: (params: { [key: string]: any }) => void) => void,
+) {
   const { on } = useContext(EventBusContext);
 
   const listenerRef = useRef(listener);
@@ -80,9 +100,12 @@ export function useEventBusListener(eventType: string, listener: () => void) {
   }, [listener]);
 
   useEffect(() => {
-    return on(eventType, () => {
-      listenerRef.current();
-    });
+    return on(
+      eventType,
+      (callback?: (params: { [key: string]: any }) => void) => {
+        listenerRef.current(callback);
+      },
+    );
   }, [eventType, on]);
 }
 

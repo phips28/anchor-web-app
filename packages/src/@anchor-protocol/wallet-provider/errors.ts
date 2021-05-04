@@ -1,5 +1,5 @@
 export class UserDeniedError extends Error {
   constructor() {
-    super('User Dinied');
+    super('User Denied');
   }
 }

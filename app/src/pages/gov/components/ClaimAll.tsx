@@ -24,6 +24,7 @@ import { useClaimableUstBorrow } from 'pages/gov/queries/claimableUstBorrow';
 import { allClaimOptions } from 'pages/gov/transactions/allClaimOptions';
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
+import { useEventBus, useEventBusListener } from '@terra-dev/event-bus';
 
 export interface ClaimAllComponentProps {
   className?: string;
@@ -36,6 +37,7 @@ function ClaimAllComponentBase({ className }: ClaimAllComponentProps) {
   const connectedWallet = useConnectedWallet();
 
   const { fixedGas } = useConstants();
+  const { dispatch } = useEventBus();
 
   const [claim, claimResult] = useOperation(allClaimOptions, {});
 
@@ -55,6 +57,34 @@ function ClaimAllComponentBase({ className }: ClaimAllComponentProps) {
   // ---------------------------------------------
   // logics
   // ---------------------------------------------
+
+  useEventBusListener('auto-claim-all', async () => {
+    if (
+      connectedWallet &&
+      claimingBorrowerInfoPendingRewards &&
+      claimingLpStaingInfoPendingRewards
+    ) {
+      await proceed(
+        connectedWallet,
+        claimingBorrowerInfoPendingRewards.gte(MINIMUM_CLAIM_BALANCE),
+        claimingLpStaingInfoPendingRewards.gte(MINIMUM_CLAIM_BALANCE),
+      );
+    }
+  });
+
+  // send event after finished
+  useMemo(() => {
+    // console.log('ClaimAll: status changed', claimResult);
+    switch (claimResult?.status) {
+      case 'done':
+        dispatch('claim-all-done');
+        break;
+      case 'fault':
+        dispatch('claim-all-fault');
+        break;
+    }
+  }, [claimResult, dispatch]);
+
   const claimingBorrowerInfoPendingRewards = useMemo(() => {
     if (!borrowerInfo) return undefined;
     return big(borrowerInfo.pending_rewards) as uANC<Big>;

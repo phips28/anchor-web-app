@@ -26,6 +26,7 @@ import { validateTxFee } from 'logics/validateTxFee';
 import { useRewardsAncUstLp } from 'pages/gov/queries/rewardsAncUstLp';
 import { ancUstLpStakeOptions } from 'pages/gov/transactions/ancUstLpStakeOptions';
 import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import { useEventBus, useEventBusListener } from '@terra-dev/event-bus';
 
 export function AncUstLpStake() {
   // ---------------------------------------------
@@ -33,6 +34,7 @@ export function AncUstLpStake() {
   // ---------------------------------------------
   const connectedWallet = useConnectedWallet();
 
+  const { dispatch } = useEventBus();
   const { fixedGas } = useConstants();
 
   const [stake, stakeResult] = useOperation(ancUstLpStakeOptions, {});
@@ -50,6 +52,40 @@ export function AncUstLpStake() {
   const {
     data: { userLPBalance },
   } = useRewardsAncUstLp();
+
+  // ---------------------------------------------
+  // logics x external
+  // ---------------------------------------------
+  useEventBusListener('auto-stake-lp', async () => {
+    if (!userLPBalance) {
+      dispatch('stake-lp-error');
+      alert('Stake LP: Not LP tokens');
+      return;
+    }
+    const useLpAmount = formatLPInput(demicrofy(userLPBalance.balance));
+    setLpAmount(useLpAmount);
+
+    if (connectedWallet) {
+      await proceed(connectedWallet, useLpAmount);
+    } else {
+      dispatch('stake-lp-error');
+      alert('Stake LP: Wallet not connected');
+      return;
+    }
+  });
+
+  // send event after finished
+  useMemo(() => {
+    // console.log('AncUstLpStale: status changed', stakeResult);
+    switch (stakeResult?.status) {
+      case 'done':
+        dispatch('stake-lp-done');
+        break;
+      case 'fault':
+        dispatch('stake-lp-fault');
+        break;
+    }
+  }, [stakeResult, dispatch]);
 
   // ---------------------------------------------
   // logics
