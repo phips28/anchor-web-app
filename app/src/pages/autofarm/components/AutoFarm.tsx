@@ -69,7 +69,7 @@ function AutoFarmBase({ className }: AutoFarmProps) {
   useEventBusListener('provide-liquidity-done', async () => {
     await new Promise<void>((resolve) => resolve()); // hack next tick
 
-    setFarming(false);
+    setFarming(true);
     setCurrentStep(2);
 
     await sleep(2000); // wait till wallet updates
