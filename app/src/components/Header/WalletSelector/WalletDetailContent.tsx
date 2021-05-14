@@ -12,9 +12,10 @@ import {
   WalletReady,
   WalletStatusType,
 } from '@anchor-protocol/wallet-provider';
-import { Check, KeyboardArrowRight } from '@material-ui/icons';
+import { Check, KeyboardArrowRight, Launch } from '@material-ui/icons';
 import { FlatButton } from '@terra-dev/neumorphism-ui/components/FlatButton';
 import { IconSpan } from '@terra-dev/neumorphism-ui/components/IconSpan';
+import { Tooltip } from '@terra-dev/neumorphism-ui/components/Tooltip';
 import { Bank } from 'base/contexts/bank';
 import { useCallback } from 'react';
 import useClipboard from 'react-use-clipboard';
@@ -103,16 +104,44 @@ export function WalletDetailContentBase({
         </ul>
 
         {status.status === WalletStatusType.CONNECTED && (
-          <div className="send">
-            <FlatButton
-              onClick={() => {
-                openSend();
-                closePopup();
-              }}
-            >
-              SEND
-            </FlatButton>
-          </div>
+          <>
+            <div className="bridge">
+              <div>
+                <Tooltip
+                  title="Transfer Terra assets from Ethereum"
+                  placement="top"
+                >
+                  <FlatButton
+                    component="a"
+                    href="https://bridge.terra.money/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <img src="/assets/bridge.png" alt="Terra Bridge" />
+                  </FlatButton>
+                </Tooltip>
+                <FlatButton
+                  component="a"
+                  href="https://docs.anchorprotocol.com/user-guide/interchain-transfers"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Docs <Launch />
+                </FlatButton>
+              </div>
+            </div>
+
+            <div className="send">
+              <FlatButton
+                onClick={() => {
+                  openSend();
+                  closePopup();
+                }}
+              >
+                SEND
+              </FlatButton>
+            </div>
+          </>
         )}
 
         <div className="outlink">
@@ -226,6 +255,49 @@ export const WalletDetailContent = styled(WalletDetailContentBase)`
       }
 
       margin-bottom: 20px;
+    }
+
+    .bridge {
+      margin-bottom: 10px;
+
+      > div {
+        display: flex;
+
+        > :first-child {
+          flex: 1;
+          height: 28px;
+
+          background-color: ${({ theme }) => theme.colors.positive};
+
+          img {
+            height: 24px;
+            transform: translateX(5px);
+          }
+
+          border-top-right-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+
+        > :last-child {
+          font-size: 12px;
+
+          width: 60px;
+          height: 28px;
+
+          margin-left: 1px;
+
+          background-color: ${({ theme }) => theme.colors.positive};
+
+          svg {
+            margin-left: 3px;
+            font-size: 1em;
+            transform: scale(1.1);
+          }
+
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+        }
+      }
     }
 
     .send {
