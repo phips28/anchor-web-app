@@ -1,3 +1,6 @@
+import { formatRate } from '@anchor-protocol/notation';
+import type { Rate } from '@anchor-protocol/types';
+import { InfoOutlined } from '@material-ui/icons';
 import {
   HorizontalGraphBar,
   Rect,
@@ -5,11 +8,9 @@ import {
 import { HorizontalGraphSlider } from '@terra-dev/neumorphism-ui/components/HorizontalGraphSlider';
 import { IconSpan } from '@terra-dev/neumorphism-ui/components/IconSpan';
 import { Tooltip } from '@terra-dev/neumorphism-ui/components/Tooltip';
-import { formatRate } from '@anchor-protocol/notation';
-import type { Rate } from '@anchor-protocol/types';
-import { InfoOutlined } from '@material-ui/icons';
 import big, { Big, BigSource } from 'big.js';
 import React, { useCallback, useMemo } from 'react';
+import { useMediaQuery } from 'react-responsive';
 import { useTheme } from 'styled-components';
 import { GraphLabel } from './GraphLabel';
 import { GraphTick } from './GraphTick';
@@ -25,6 +26,7 @@ export interface Data {
 export interface LTVGraphProps {
   maxLtv: Rate<BigSource>;
   safeLtv: Rate<BigSource>;
+  dangerLtv: Rate<BigSource>;
   currentLtv: Rate<Big> | undefined;
   nextLtv: Rate<Big> | undefined;
   // draftLtv => (fix with amount format 0.000 -> fixed ltv)
@@ -68,6 +70,7 @@ export function LTVGraph({
   maxLtv,
   safeLtv,
   nextLtv,
+  dangerLtv,
   userMaxLtv,
   userMinLtv,
   onChange,
@@ -75,6 +78,8 @@ export function LTVGraph({
   disabled,
 }: LTVGraphProps) {
   const theme = useTheme();
+
+  const isSmallScreen = useMediaQuery({ maxWidth: 700 });
 
   const step = useCallback(
     (draftLtv: number) => {
@@ -91,13 +96,13 @@ export function LTVGraph({
   );
 
   const color = useMemo(() => {
-    return nextLtv?.gte(maxLtv)
+    return nextLtv?.gte(dangerLtv)
       ? theme.colors.negative
       : nextLtv?.gte(safeLtv)
       ? theme.colors.warning
       : theme.colors.positive;
   }, [
-    maxLtv,
+    dangerLtv,
     nextLtv,
     safeLtv,
     theme.colors.negative,
@@ -112,7 +117,7 @@ export function LTVGraph({
       data={[
         {
           position: 'top',
-          label: `MAX LTV: ${formatRate(maxLtv)}%`,
+          label: `${formatRate(maxLtv)}% LTV${isSmallScreen ? '' : ' (MAX)'}`,
           color: 'rgba(0, 0, 0, 0)',
           value: big(maxLtv).toNumber(),
           tooltip:
@@ -120,7 +125,7 @@ export function LTVGraph({
         },
         {
           position: 'top',
-          label: `SAFE LTV: ${formatRate(safeLtv)}%`,
+          label: `${formatRate(safeLtv)}% LTV`,
           color: 'rgba(0, 0, 0, 0)',
           value: big(safeLtv).toNumber(),
           tooltip: 'Recommended LTV',

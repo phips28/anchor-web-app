@@ -4,15 +4,17 @@ import {
   formatLP,
 } from '@anchor-protocol/notation';
 import { uANC, uUST } from '@anchor-protocol/types';
+import {
+  useAncLpStakingStateQuery,
+  useAncPriceQuery,
+  useRewardsClaimableAncUstLpRewardsQuery,
+} from '@anchor-protocol/webapp-provider';
 import { TooltipLabel } from '@terra-dev/neumorphism-ui/components/TooltipLabel';
 import {
   rulerLightColor,
   rulerShadowColor,
 } from '@terra-dev/styled-neumorphism';
 import big, { Big } from 'big.js';
-import { useANCPrice } from 'pages/gov/queries/ancPrice';
-import { useClaimableAncUstLp } from 'pages/gov/queries/claimableAncUstLp';
-import { useLPStakingState } from 'pages/gov/queries/lpStakingState';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 
@@ -21,17 +23,13 @@ export interface AncUstLpStakeOverviewProps {
 }
 
 function AncUstLpStakeOverviewBase({ className }: AncUstLpStakeOverviewProps) {
-  const {
-    data: { ancPrice },
-  } = useANCPrice();
+  const { data: { ancPrice } = {} } = useAncPriceQuery();
+
+  const { data: { lpStakingState } = {} } = useAncLpStakingStateQuery();
 
   const {
-    data: { lpStakingState },
-  } = useLPStakingState();
-
-  const {
-    data: { userLPStakingInfo, userLPBalance },
-  } = useClaimableAncUstLp();
+    data: { lPBalance: userLPBalance, lPStakerInfo: userLPStakingInfo } = {},
+  } = useRewardsClaimableAncUstLpRewardsQuery();
 
   const ancUstLp = useMemo(() => {
     if (!ancPrice || !lpStakingState || !userLPStakingInfo || !userLPBalance) {
@@ -147,9 +145,21 @@ export const AncUstLpStakeOverview = styled(AncUstLpStakeOverviewBase)`
 
   @media (max-width: 500px) {
     grid-template-columns: 1fr;
-    grid-template-rows: repeat(3, 90px);
+    grid-template-rows: repeat(3, 60px);
 
     li {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+
+      span {
+        margin-bottom: 0;
+      }
+
+      p {
+        font-size: 15px;
+      }
+
       &:not(:last-child) {
         border-right: 0;
         border-bottom: 1px solid

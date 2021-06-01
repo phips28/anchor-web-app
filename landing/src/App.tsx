@@ -1,13 +1,65 @@
-import { AppProviders } from 'base/AppProviders';
+import { LandingProviders } from 'base/AppProviders';
+import {
+  ArcElement,
+  BarController,
+  BarElement,
+  BubbleController,
+  CategoryScale,
+  Chart,
+  DoughnutController,
+  Filler,
+  Legend,
+  LinearScale,
+  LineController,
+  LineElement,
+  LogarithmicScale,
+  PieController,
+  PointElement,
+  PolarAreaController,
+  RadarController,
+  RadialLinearScale,
+  ScatterController,
+  TimeScale,
+  TimeSeriesScale,
+  Title,
+  Tooltip,
+} from 'chart.js';
 import { Header } from 'components/Header';
 import { Index } from 'pages/index';
-import { Market } from 'pages/market-simple';
+import { Market } from 'pages/market';
 import { Redirect, Route, Switch } from 'react-router-dom';
+import { GlobalStyle } from './components/GlobalStyle';
+
+Chart.register(
+  ArcElement,
+  LineElement,
+  BarElement,
+  PointElement,
+  BarController,
+  BubbleController,
+  DoughnutController,
+  LineController,
+  PieController,
+  PolarAreaController,
+  RadarController,
+  ScatterController,
+  CategoryScale,
+  LinearScale,
+  LogarithmicScale,
+  RadialLinearScale,
+  TimeScale,
+  TimeSeriesScale,
+  Filler,
+  Legend,
+  Title,
+  Tooltip,
+);
 
 export function App() {
   return (
-    <AppProviders enableWatchConnection={false}>
+    <LandingProviders>
       <div>
+        <GlobalStyle />
         <Header />
         <Switch>
           {/*<Route exact path="/" component={Index} />*/}
@@ -23,6 +75,6 @@ export function App() {
           <Redirect to="/" />
         </Switch>
       </div>
-    </AppProviders>
+    </LandingProviders>
   );
 }

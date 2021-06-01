@@ -5,7 +5,17 @@ import {
   formatUTokenDecimal2,
 } from '@anchor-protocol/notation';
 import { anc160gif, GifIcon, TokenIcon } from '@anchor-protocol/token-icons';
-import { Rate, uANC, UST, uToken } from '@anchor-protocol/types';
+import { HumanAddr, Rate, uANC, UST, uToken } from '@anchor-protocol/types';
+import {
+  useAncBalanceQuery,
+  useAnchorWebapp,
+  useAncLpStakingStateQuery,
+  useAncPriceQuery,
+  useAncTokenInfoQuery,
+  useBorrowAPYQuery,
+  useGovStateQuery,
+  useRewardsAnchorLpRewardsQuery,
+} from '@anchor-protocol/webapp-provider';
 import { ChevronRight } from '@material-ui/icons';
 import { BorderButton } from '@terra-dev/neumorphism-ui/components/BorderButton';
 import { IconSpan } from '@terra-dev/neumorphism-ui/components/IconSpan';
@@ -16,16 +26,11 @@ import { TooltipLabel } from '@terra-dev/neumorphism-ui/components/TooltipLabel'
 import big, { Big } from 'big.js';
 import { Circles } from 'components/Circles';
 import { screen } from 'env';
-import { useBorrowAPY } from 'pages/borrow/queries/borrowAPY';
 import {
   ancGovernancePathname,
   ancUstLpPathname,
   govPathname,
 } from 'pages/gov/env';
-import { useAnchorLPRewards } from 'pages/gov/queries/anchorLPRewards';
-import { useANCPrice } from 'pages/gov/queries/ancPrice';
-import { useLPStakingState } from 'pages/gov/queries/lpStakingState';
-import { useTotalStakedMain } from 'pages/gov/queries/totalStakedMain';
 import React, { useMemo } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
@@ -35,45 +40,50 @@ export interface OverviewProps {
 }
 
 function OverviewBase({ className }: OverviewProps) {
-  const {
-    data: { ancPrice },
-  } = useANCPrice();
+  const { contractAddress } = useAnchorWebapp();
+
+  const { data: { ancPrice } = {} } = useAncPriceQuery();
+
+  const { data: { govRewards, lpRewards } = {} } = useBorrowAPYQuery();
 
   const {
-    data: { govRewards, lpRewards },
-  } = useBorrowAPY();
-
-  const {
-    data: { apyLPRewards },
-  } = useAnchorLPRewards();
+    data: { anchorLpRewards: apyLPRewards } = {},
+  } = useRewardsAnchorLpRewardsQuery();
 
   const history = useHistory();
 
+  const { data: { ancTokenInfo } = {} } = useAncTokenInfoQuery();
+  const { data: { ancBalance: govANCBalance } = {} } = useAncBalanceQuery(
+    contractAddress.anchorToken.gov,
+  );
+  const { data: { ancBalance: communityANCBalance } = {} } = useAncBalanceQuery(
+    contractAddress.anchorToken.community,
+  );
   const {
-    data: {
-      ancTokenInfo,
-      govANCBalance,
-      communityANCBalance,
-      distributorANCBalance,
-      lpStakingANCBalance,
-      airdropANCBalance,
-      investorTeamLockANCBalance,
-      govState,
-      govConfig,
-    },
-  } = useTotalStakedMain();
+    data: { ancBalance: distributorANCBalance } = {},
+  } = useAncBalanceQuery(contractAddress.anchorToken.distributor);
+  const { data: { ancBalance: lpStakingANCBalance } = {} } = useAncBalanceQuery(
+    contractAddress.anchorToken.staking,
+  );
+  const { data: { ancBalance: airdropANCBalance } = {} } = useAncBalanceQuery(
+    'terra146ahqn6d3qgdvmj8cj96hh03dzmeedhsf0kxqm' as HumanAddr,
+  );
+  const {
+    data: { ancBalance: investorTeamLockANCBalance } = {},
+  } = useAncBalanceQuery(
+    'terra1dp0taj85ruc299rkdvzp4z5pfg6z6swaed74e6' as HumanAddr,
+  );
+  const { data: { govState, govConfig } = {} } = useGovStateQuery();
 
-  const {
-    data: { lpStakingState },
-  } = useLPStakingState();
+  const { data: { lpStakingState } = {} } = useAncLpStakingStateQuery();
 
   const ancUstLpAprTooltip = useMemo(() => {
     let defaultTooltip = 'LP rewards APR';
 
     if (apyLPRewards && apyLPRewards.length > 0) {
-      const apr = big(big(apyLPRewards[0].APY).div(365).plus(1)).pow(
-        365,
-      ).minus(1) as Rate<Big>;
+      const apr = big(big(apyLPRewards[0].APY).div(365).plus(1))
+        .pow(365)
+        .minus(1) as Rate<Big>;
 
       return `${formatRate(apr).toString()}% (if compounded daily)`;
     }
