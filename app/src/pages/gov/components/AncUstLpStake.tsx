@@ -13,11 +13,11 @@ import {
   useAnchorWebapp,
   useRewardsAncUstLpRewardsQuery,
 } from '@anchor-protocol/webapp-provider';
+import { useConnectedWallet } from '@terra-money/wallet-provider';
 import { InputAdornment } from '@material-ui/core';
 import { StreamStatus } from '@rx-stream/react';
 import { ActionButton } from '@terra-dev/neumorphism-ui/components/ActionButton';
 import { NumberInput } from '@terra-dev/neumorphism-ui/components/NumberInput';
-import { useConnectedWallet } from '@terra-money/wallet-provider';
 import { useBank } from 'base/contexts/bank';
 import big from 'big.js';
 import { MessageBox } from 'components/MessageBox';
@@ -65,7 +65,7 @@ export function AncUstLpStake() {
     setLpAmount(useLpAmount);
 
     if (connectedWallet) {
-      await proceed(connectedWallet, useLpAmount);
+      await proceed(useLpAmount);
     } else {
       dispatch('stake-lp-error');
       alert('Stake LP: Wallet not connected');
@@ -77,10 +77,10 @@ export function AncUstLpStake() {
   useMemo(() => {
     // console.log('AncUstLpStale: status changed', stakeResult);
     switch (stakeResult?.status) {
-      case 'done':
+      case StreamStatus.DONE:
         dispatch('stake-lp-done');
         break;
-      case 'fault':
+      case StreamStatus.ERROR:
         dispatch('stake-lp-fault');
         break;
     }

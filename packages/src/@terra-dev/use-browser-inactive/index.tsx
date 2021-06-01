@@ -18,7 +18,7 @@ export interface BrowserInactive {
 
 // @ts-ignore
 const BrowserInactiveContext: Context<BrowserInactive> =
-  createContext<BrowserInactive>();
+  createContext<BrowserInactive>(undefined as any);
 
 export function BrowserInactiveProvider({
   children,

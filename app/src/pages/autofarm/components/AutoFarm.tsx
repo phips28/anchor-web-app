@@ -10,8 +10,8 @@ import { Section } from '@terra-dev/neumorphism-ui/components/Section';
 import { AncUstLpProvide } from '../../gov/components/AncUstLpProvide';
 import { ActionButton } from '@terra-dev/neumorphism-ui/components/ActionButton';
 import { PushSpinner } from 'react-spinners-kit';
-import { useConnectedWallet } from '@anchor-protocol/wallet-provider';
 import { sleep } from '../../../logics/sleep';
+import { useConnectedWallet } from '@terra-money/wallet-provider';
 
 export interface AutoFarmProps {
   className?: string;
@@ -51,7 +51,7 @@ function AutoFarmBase({ className }: AutoFarmProps) {
     setFarming(true);
     setCurrentStep(1);
 
-    await sleep(2000); // wait till wallet updates
+    await sleep(2500); // wait till wallet updates
 
     // provide liquidity
     dispatch('auto-provide-liquidity');
@@ -72,7 +72,7 @@ function AutoFarmBase({ className }: AutoFarmProps) {
     setFarming(true);
     setCurrentStep(2);
 
-    await sleep(2000); // wait till wallet updates
+    await sleep(2500); // wait till wallet updates
 
     // provide liquidity
     dispatch('auto-stake-lp');

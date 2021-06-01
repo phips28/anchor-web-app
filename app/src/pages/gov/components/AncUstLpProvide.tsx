@@ -141,7 +141,6 @@ export function AncUstLpProvide() {
 
     if (connectedWallet && useNextSimulation) {
       await proceed(
-        connectedWallet,
         nextAncAmount,
         formatUSTInput(useUstAmount as UST),
         useNextSimulation.txFee.toFixed() as uUST,
@@ -159,10 +158,10 @@ export function AncUstLpProvide() {
   useMemo(() => {
     // console.log('AncUstLpProvide: status changed', provideResult);
     switch (provideResult?.status) {
-      case 'done':
+      case StreamStatus.DONE:
         dispatch('provide-liquidity-done');
         break;
-      case 'fault':
+      case StreamStatus.ERROR:
         dispatch('provide-liquidity-fault');
         break;
     }

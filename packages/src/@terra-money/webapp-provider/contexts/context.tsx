@@ -51,7 +51,7 @@ export interface TerraWebapp {
 
 // @ts-ignore
 export const TerraWebappContext: Context<TerraWebapp> =
-  createContext<TerraWebapp>();
+  createContext<TerraWebapp>(undefined as any);
 
 export function TerraWebappProvider({
   children,

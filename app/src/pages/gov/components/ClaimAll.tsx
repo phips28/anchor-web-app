@@ -4,27 +4,26 @@ import {
   formatUST,
 } from '@anchor-protocol/notation';
 import { uANC } from '@anchor-protocol/types';
-import {
-  useConnectedWallet,
-  WalletReady,
-} from '@anchor-protocol/wallet-provider';
-import { useOperation } from '@terra-dev/broadcastable-operation';
+import { useConnectedWallet } from '@terra-money/wallet-provider';
 import { ActionButton } from '@terra-dev/neumorphism-ui/components/ActionButton';
 import { Section } from '@terra-dev/neumorphism-ui/components/Section';
 import { useBank } from 'base/contexts/bank';
-import { useConstants } from 'base/contexts/contants';
 import big, { Big } from 'big.js';
 import { MessageBox } from 'components/MessageBox';
-import { TransactionRenderer } from 'components/TransactionRenderer';
 import { TxFeeList, TxFeeListItem } from 'components/TxFeeList';
 import { validateTxFee } from 'logics/validateTxFee';
 import { MINIMUM_CLAIM_BALANCE } from 'pages/gov/env';
-import { useClaimableAncUstLp } from 'pages/gov/queries/claimableAncUstLp';
-import { useClaimableUstBorrow } from 'pages/gov/queries/claimableUstBorrow';
-import { allClaimOptions } from 'pages/gov/transactions/allClaimOptions';
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { useEventBus, useEventBusListener } from '@terra-dev/event-bus';
+import {
+  useAnchorWebapp,
+  useRewardsAllClaimTx,
+  useRewardsClaimableAncUstLpRewardsQuery,
+  useRewardsClaimableUstBorrowRewardsQuery,
+} from '@anchor-protocol/webapp-provider';
+import { TxResultRenderer } from '../../../components/TxResultRenderer';
+import { StreamStatus } from '@rx-stream/react';
 
 export interface ClaimAllComponentProps {
   className?: string;
@@ -36,23 +35,23 @@ function ClaimAllComponentBase({ className }: ClaimAllComponentProps) {
   // ---------------------------------------------
   const connectedWallet = useConnectedWallet();
 
-  const { fixedGas } = useConstants();
+  const {
+    constants: { fixedGas },
+  } = useAnchorWebapp();
   const { dispatch } = useEventBus();
 
-  const [claim, claimResult] = useOperation(allClaimOptions, {});
+  const [claim, claimResult] = useRewardsAllClaimTx();
 
   // ---------------------------------------------
   // queries
   // ---------------------------------------------
   const bank = useBank();
 
-  const {
-    data: { borrowerInfo, userANCBalance },
-  } = useClaimableUstBorrow();
+  const { data: { borrowerInfo, userANCBalance } = {} } =
+    useRewardsClaimableUstBorrowRewardsQuery();
 
-  const {
-    data: { userLPStakingInfo },
-  } = useClaimableAncUstLp();
+  const { data: { lPStakerInfo: userLPStakingInfo } = {} } =
+    useRewardsClaimableAncUstLpRewardsQuery();
 
   // ---------------------------------------------
   // logics
@@ -65,7 +64,6 @@ function ClaimAllComponentBase({ className }: ClaimAllComponentProps) {
       claimingLpStaingInfoPendingRewards
     ) {
       await proceed(
-        connectedWallet,
         claimingBorrowerInfoPendingRewards.gte(MINIMUM_CLAIM_BALANCE),
         claimingLpStaingInfoPendingRewards.gte(MINIMUM_CLAIM_BALANCE),
       );
@@ -76,10 +74,10 @@ function ClaimAllComponentBase({ className }: ClaimAllComponentProps) {
   useMemo(() => {
     // console.log('ClaimAll: status changed', claimResult);
     switch (claimResult?.status) {
-      case 'done':
+      case StreamStatus.DONE:
         dispatch('claim-all-done');
         break;
-      case 'fault':
+      case StreamStatus.ERROR:
         dispatch('claim-all-fault');
         break;
     }
@@ -119,33 +117,31 @@ function ClaimAllComponentBase({ className }: ClaimAllComponentProps) {
   );
 
   const proceed = useCallback(
-    async (
-      walletReady: WalletReady,
-      claimMoneyMarketRewards: boolean,
-      cliamLpStakingRewards: boolean,
-    ) => {
-      await claim({
-        walletAddress: walletReady.walletAddress,
-        cliamLpStakingRewards,
-        claimMoneyMarketRewards,
+    (claimMoneyMarketRewards: boolean, cliamLpStakingRewards: boolean) => {
+      if (!connectedWallet || !claim) {
+        return;
+      }
+
+      claim({
+        claimAncUstLp: cliamLpStakingRewards,
+        claimUstBorrow: claimMoneyMarketRewards,
       });
     },
-    [claim],
+    [claim, connectedWallet],
   );
 
   // ---------------------------------------------
   // presentation
   // ---------------------------------------------
   if (
-    claimResult?.status === 'in-progress' ||
-    claimResult?.status === 'done' ||
-    claimResult?.status === 'fault'
+    claimResult?.status === StreamStatus.IN_PROGRESS ||
+    claimResult?.status === StreamStatus.DONE
   ) {
-    const onExit = undefined;
+    const onExit = () => {};
 
     return (
       <Section className={className}>
-        <TransactionRenderer result={claimResult} onExit={onExit} />
+        <TxResultRenderer resultRendering={claimResult.value} onExit={onExit} />
       </Section>
     );
   }
@@ -173,6 +169,8 @@ function ClaimAllComponentBase({ className }: ClaimAllComponentProps) {
         className="proceed"
         disabled={
           !connectedWallet ||
+          !connectedWallet.availablePost ||
+          !claim ||
           !claimingLpStaingInfoPendingRewards ||
           !claimingBorrowerInfoPendingRewards ||
           !claiming ||
@@ -180,11 +178,9 @@ function ClaimAllComponentBase({ className }: ClaimAllComponentProps) {
             claimingLpStaingInfoPendingRewards.lt(MINIMUM_CLAIM_BALANCE))
         }
         onClick={() =>
-          connectedWallet &&
           claimingBorrowerInfoPendingRewards &&
           claimingLpStaingInfoPendingRewards &&
           proceed(
-            connectedWallet,
             claimingBorrowerInfoPendingRewards.gte(MINIMUM_CLAIM_BALANCE),
             claimingLpStaingInfoPendingRewards.gte(MINIMUM_CLAIM_BALANCE),
           )
