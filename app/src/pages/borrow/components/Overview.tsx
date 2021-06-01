@@ -10,53 +10,66 @@ import {
   formatRate,
   formatUSTWithPostfixUnits,
 } from '@anchor-protocol/notation';
-import { Rate, uUST } from '@anchor-protocol/types';
+import { Rate } from '@anchor-protocol/types';
+import {
+  useAnchorWebapp,
+  useBorrowAPYQuery,
+  useBorrowBorrowerQuery,
+  useBorrowMarketQuery,
+} from '@anchor-protocol/webapp-provider';
 import { IconCircle } from '@terra-dev/neumorphism-ui/components/IconCircle';
 import { IconSpan } from '@terra-dev/neumorphism-ui/components/IconSpan';
 import { InfoTooltip } from '@terra-dev/neumorphism-ui/components/InfoTooltip';
 import { Section } from '@terra-dev/neumorphism-ui/components/Section';
 import { TooltipIconCircle } from '@terra-dev/neumorphism-ui/components/TooltipIconCircle';
-import { useConstants } from 'base/contexts/contants';
-import big, { Big, BigSource } from 'big.js';
+import big, { Big } from 'big.js';
 import { screen } from 'env';
-import { BorrowLimitGraph } from 'pages/borrow/components/BorrowLimitGraph';
-import { useMarket } from 'pages/borrow/context/market';
-import { apr as _apr } from 'pages/borrow/logics/apr';
-import { borrowed as _borrowed } from 'pages/borrow/logics/borrowed';
-import { collaterals as _collaterals } from 'pages/borrow/logics/collaterals';
-import { useBorrowAPY } from 'pages/borrow/queries/borrowAPY';
+import { currentLtv as _currentLtv } from 'pages/borrow/logics/currentLtv';
 import { useMemo } from 'react';
 import styled from 'styled-components';
+import { apr as _apr } from '../logics/apr';
+import { borrowed as _borrowed } from '../logics/borrowed';
+import { collaterals as _collaterals } from '../logics/collaterals';
+import { BorrowLimitGraph } from './BorrowLimitGraph';
 
 export interface OverviewProps {
   className?: string;
 }
 
 function OverviewBase({ className }: OverviewProps) {
-  const {
-    borrowRate,
-    loanAmount,
-    borrowInfo,
-    oraclePrice,
-    bLunaMaxLtv,
-  } = useMarket();
+  const { data: { borrowRate, oraclePrice, bLunaSafeLtv, bLunaMaxLtv } = {} } =
+    useBorrowMarketQuery();
 
-  const { blocksPerYear } = useConstants();
-
-  const apr = useMemo(() => _apr(borrowRate, blocksPerYear), [
-    blocksPerYear,
-    borrowRate,
-  ]);
+  const { data: { marketBorrowerInfo, custodyBorrower } = {} } =
+    useBorrowBorrowerQuery();
 
   const {
-    data: { borrowerDistributionAPYs },
-  } = useBorrowAPY();
+    constants: { blocksPerYear },
+  } = useAnchorWebapp();
 
-  const borrowed = useMemo(() => _borrowed(loanAmount), [loanAmount]);
+  const { data: { borrowerDistributionAPYs } = {} } = useBorrowAPYQuery();
+
+  const currentLtv = useMemo(
+    () =>
+      marketBorrowerInfo && custodyBorrower && oraclePrice
+        ? _currentLtv(marketBorrowerInfo, custodyBorrower, oraclePrice)
+        : undefined,
+    [custodyBorrower, marketBorrowerInfo, oraclePrice],
+  );
+
+  const apr = useMemo(
+    () => _apr(borrowRate, blocksPerYear),
+    [blocksPerYear, borrowRate],
+  );
+
+  const borrowed = useMemo(
+    () => _borrowed(marketBorrowerInfo),
+    [marketBorrowerInfo],
+  );
 
   const collaterals = useMemo(
-    () => _collaterals(borrowInfo, oraclePrice?.rate),
-    [borrowInfo, oraclePrice?.rate],
+    () => _collaterals(custodyBorrower, oraclePrice?.rate),
+    [custodyBorrower, oraclePrice?.rate],
   );
 
   return (
@@ -178,13 +191,17 @@ function OverviewBase({ className }: OverviewProps) {
         </div>
       </article>
 
-      <figure>
-        <BorrowLimitGraph
-          bLunaMaxLtv={bLunaMaxLtv ?? (0 as Rate<BigSource>)}
-          collateralValue={collaterals}
-          loanAmount={loanAmount?.loan_amount ?? (0 as uUST<BigSource>)}
-        />
-      </figure>
+      {currentLtv && bLunaSafeLtv && bLunaMaxLtv && marketBorrowerInfo && (
+        <figure>
+          <BorrowLimitGraph
+            ltv={currentLtv}
+            bLunaSafeLtv={bLunaSafeLtv}
+            bLunaMaxLtv={bLunaMaxLtv}
+            collateralValue={collaterals}
+            loanAmount={marketBorrowerInfo.loan_amount}
+          />
+        </figure>
+      )}
     </Section>
   );
 }
@@ -271,6 +288,12 @@ export const Overview = styled(OverviewBase)`
       .value {
         font-weight: 500;
       }
+    }
+  }
+
+  @media (max-width: ${screen.mobile.max}px) {
+    article > div {
+      padding: 20px;
     }
   }
 `;
