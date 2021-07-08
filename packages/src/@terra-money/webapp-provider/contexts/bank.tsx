@@ -73,7 +73,7 @@ export interface TokenBalancesProviderProps {
 
 export interface Bank<
   TokenBalancesType = Record<string, string>,
-  TaxDataType = TaxData
+  TaxDataType = TaxData,
 > {
   tokenBalances: TokenBalancesType;
   refetchTokenBalances: () => Promise<TokenBalancesType>;
@@ -149,9 +149,8 @@ export function BankProvider({
     browserInactiveRef.current = browserInactive;
   }, [browserInactive]);
 
-  const [tokenBalances, setTokenBalances] = useState<Record<string, string>>(
-    emptyTokenBalances,
-  );
+  const [tokenBalances, setTokenBalances] =
+    useState<Record<string, string>>(emptyTokenBalances);
 
   const [tax, setTax] = useState<TaxData>(emptyTax);
 
@@ -290,9 +289,9 @@ export function BankProvider({
 
 export function useBank<
   TokenBalancesType = Record<string, string>,
-  TaxDataType = TaxData
+  TaxDataType = TaxData,
 >(): Bank<TokenBalancesType, TaxDataType> {
-  return (useContext(BankContext) as unknown) as Bank<
+  return useContext(BankContext) as unknown as Bank<
     TokenBalancesType,
     TaxDataType
   >;

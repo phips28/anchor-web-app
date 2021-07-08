@@ -23,9 +23,8 @@ export function TransactionHistorySection({
   // ---------------------------------------------
   // queries
   // ---------------------------------------------
-  const {
-    data: { transactionHistory } = {},
-  } = useEarnTransactionHistoryQuery();
+  const { data: { transactionHistory } = {} } =
+    useEarnTransactionHistoryQuery();
 
   // ---------------------------------------------
   // computes

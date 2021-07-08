@@ -49,9 +49,8 @@ export function SnackbarProvider({
 
   const [contents, setContents] = useState<ReactElement<SnackbarProps>[]>([]);
 
-  const snackbarContainerRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(
-    null,
-  );
+  const snackbarContainerRef: RefObject<HTMLDivElement> =
+    useRef<HTMLDivElement>(null);
 
   const addSnackbar = useCallback(
     (element: ReactElement<SnackbarProps>) => {

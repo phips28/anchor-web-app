@@ -68,7 +68,8 @@ export function PollCreateModifyBorrowInterest() {
   // ---------------------------------------------
   const createMsgs = useCallback(
     (baseBorrowRate: string, interestMultiplier: string): ExecuteMsg[] => {
-      const interestModelConfig: moneyMarket.interestModel.UpdateConfig['update_config'] = {};
+      const interestModelConfig: moneyMarket.interestModel.UpdateConfig['update_config'] =
+        {};
 
       if (baseBorrowRate.length > 0) {
         interestModelConfig['base_rate'] = formatExecuteMsgNumber(

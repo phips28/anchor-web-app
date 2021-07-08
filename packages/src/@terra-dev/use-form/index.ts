@@ -20,7 +20,7 @@ function shallowEqual(a: any, b: any): boolean {
 export function useForm<
   Input extends {},
   Dependency extends {},
-  States extends {}
+  States extends {},
 >(
   form: (input: Input, dependency: Dependency) => States,
   dependency: Dependency,

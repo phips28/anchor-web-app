@@ -13,10 +13,8 @@ export function useDialog<Param = {}, Return = void>(
   OpenDialog<Param extends DialogProps<infer P, any> ? P : Param, Return>,
   ReactNode,
 ] {
-  const [dialogProps, setDialogProps] = useState<DialogProps<
-    Param,
-    Return
-  > | null>(null);
+  const [dialogProps, setDialogProps] =
+    useState<DialogProps<Param, Return> | null>(null);
 
   const openDialog: OpenDialog<any, Return> = useCallback(
     async (props: Param) => {

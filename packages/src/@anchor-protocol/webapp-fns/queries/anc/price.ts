@@ -72,9 +72,9 @@ export async function ancPriceQuery({
     rawData.ancPrice.Result,
   );
 
-  const ANCPoolSize = (assets[0].amount as unknown) as uANC;
-  const USTPoolSize = (assets[1].amount as unknown) as uUST;
-  const LPShare = (total_share as unknown) as uAncUstLP;
+  const ANCPoolSize = assets[0].amount as unknown as uANC;
+  const USTPoolSize = assets[1].amount as unknown as uUST;
+  const LPShare = total_share as unknown as uAncUstLP;
   const ANCPrice = big(USTPoolSize)
     .div(+ANCPoolSize === 0 ? '1' : ANCPoolSize)
     .toString() as UST;

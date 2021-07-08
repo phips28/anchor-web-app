@@ -67,12 +67,8 @@ export function useBorrowBorrowerQuery(): UseQueryResult<
 > {
   const connectedWallet = useConnectedWallet();
 
-  const {
-    mantleFetch,
-    mantleEndpoint,
-    lastSyncedHeight,
-    queryErrorReporter,
-  } = useTerraWebapp();
+  const { mantleFetch, mantleEndpoint, lastSyncedHeight, queryErrorReporter } =
+    useTerraWebapp();
 
   const {
     contractAddress: { moneyMarket },

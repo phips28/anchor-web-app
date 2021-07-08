@@ -729,9 +729,8 @@ export class WalletController {
       });
     };
 
-    const walletConnectSessionSubscription = subscribeWalletConnect(
-      walletConnect,
-    );
+    const walletConnectSessionSubscription =
+      subscribeWalletConnect(walletConnect);
 
     this.disableWalletConnect = () => {
       this.walletConnect?.disconnect();

@@ -34,7 +34,9 @@ export interface AnchorWebapp {
 }
 
 // @ts-ignore
-const AnchorWebappContext: Context<AnchorWebapp> = createContext<AnchorWebapp>();
+const AnchorWebappContext: Context<AnchorWebapp> = createContext<AnchorWebapp>(
+  undefined as any,
+);
 
 export function AnchorWebappProvider({
   children,

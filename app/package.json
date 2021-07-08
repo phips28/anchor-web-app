@@ -1,6 +1,6 @@
 {
   "name": "@anchor-web-app/app",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "Apache-2.0",
   "private": true,
   "// how to enable local https": "@see https://iamssen.medium.com/localhost%EC%97%90-ssl-%EC%A0%81%EC%9A%A9%ED%95%98%EA%B8%B0-b76acbaea079",

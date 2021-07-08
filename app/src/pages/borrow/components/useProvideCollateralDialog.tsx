@@ -78,10 +78,8 @@ function ComponentBase({
 
   const txFee = fixedGas;
 
-  const [
-    provideCollateral,
-    provideCollateralResult,
-  ] = useBorrowProvideCollateralTx();
+  const [provideCollateral, provideCollateralResult] =
+    useBorrowProvideCollateralTx();
 
   // ---------------------------------------------
   // states

@@ -43,12 +43,8 @@ const queryFn = ({
 export function useEarnEpochStatesQuery(): UseQueryResult<
   EarnEpochStatesData | undefined
 > {
-  const {
-    mantleFetch,
-    mantleEndpoint,
-    lastSyncedHeight,
-    queryErrorReporter,
-  } = useTerraWebapp();
+  const { mantleFetch, mantleEndpoint, lastSyncedHeight, queryErrorReporter } =
+    useTerraWebapp();
 
   const {
     contractAddress: { moneyMarket },

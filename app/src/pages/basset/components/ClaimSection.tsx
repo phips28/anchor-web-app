@@ -40,9 +40,8 @@ export function ClaimSection({ disabled, onProgress }: ClaimSectionProps) {
   // ---------------------------------------------
   const bank = useBank();
 
-  const {
-    data: { rewardState, claimableReward } = {},
-  } = useBondClaimableRewards();
+  const { data: { rewardState, claimableReward } = {} } =
+    useBondClaimableRewards();
 
   // ---------------------------------------------
   // logics

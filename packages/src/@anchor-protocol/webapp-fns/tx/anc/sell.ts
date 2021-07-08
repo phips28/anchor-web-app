@@ -155,35 +155,31 @@ interface Option {
   maxSpread?: string;
 }
 
-export const fabricatebSell = ({
-  address,
-  amount,
-  to,
-  beliefPrice,
-  maxSpread,
-}: Option) => (addressProvider: AddressProvider): MsgExecuteContract[] => {
-  validateInput([
-    validateAddress(address),
-    validateIsNumber(amount),
-    validateIsGreaterThanZero(+amount),
-  ]);
+export const fabricatebSell =
+  ({ address, amount, to, beliefPrice, maxSpread }: Option) =>
+  (addressProvider: AddressProvider): MsgExecuteContract[] => {
+    validateInput([
+      validateAddress(address),
+      validateIsNumber(amount),
+      validateIsGreaterThanZero(+amount),
+    ]);
 
-  const ancTokenAddress = addressProvider.ANC();
-  const pairAddress = addressProvider.terraswapAncUstPair();
+    const ancTokenAddress = addressProvider.ANC();
+    const pairAddress = addressProvider.terraswapAncUstPair();
 
-  return [
-    new MsgExecuteContract(address, ancTokenAddress, {
-      send: {
-        contract: pairAddress,
-        amount: new Int(new Dec(amount).mul(1000000)).toString(),
-        msg: createHookMsg({
-          swap: {
-            belief_price: beliefPrice,
-            max_spread: maxSpread,
-            to: to,
-          },
-        }),
-      },
-    }),
-  ];
-};
+    return [
+      new MsgExecuteContract(address, ancTokenAddress, {
+        send: {
+          contract: pairAddress,
+          amount: new Int(new Dec(amount).mul(1000000)).toString(),
+          msg: createHookMsg({
+            swap: {
+              belief_price: beliefPrice,
+              max_spread: maxSpread,
+              to: to,
+            },
+          }),
+        },
+      }),
+    ];
+  };

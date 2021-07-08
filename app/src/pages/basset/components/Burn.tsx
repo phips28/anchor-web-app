@@ -68,17 +68,16 @@ export function Burn() {
   // ---------------------------------------------
   const bank = useBank();
 
-  const {
-    data: { state: exchangeRate, parameters } = {},
-  } = useBondBLunaExchangeRateQuery();
+  const { data: { state: exchangeRate, parameters } = {} } =
+    useBondBLunaExchangeRateQuery();
 
   // ---------------------------------------------
   // logics
   // ---------------------------------------------
-  const pegRecoveryFee = useMemo(() => pegRecovery(exchangeRate, parameters), [
-    exchangeRate,
-    parameters,
-  ]);
+  const pegRecoveryFee = useMemo(
+    () => pegRecovery(exchangeRate, parameters),
+    [exchangeRate, parameters],
+  );
 
   const invalidTxFee = useMemo(
     () => !!connectedWallet && validateTxFee(bank, fixedGas),

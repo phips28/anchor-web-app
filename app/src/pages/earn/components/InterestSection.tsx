@@ -75,9 +75,8 @@ export function InterestSection({ className }: InterestSectionProps) {
 
   const { data: { apyHistory } = {} } = useEarnAPYHistoryQuery();
 
-  const {
-    data: { moneyMarketEpochState, overseerEpochState } = {},
-  } = useEarnEpochStatesQuery();
+  const { data: { moneyMarketEpochState, overseerEpochState } = {} } =
+    useEarnEpochStatesQuery();
 
   // ---------------------------------------------
   // computes

@@ -38,15 +38,11 @@ export function CollateralList({ className }: CollateralListProps) {
 
   const { data: { liquidationPrice } = {} } = useBorrowLiquidationPriceQuery();
 
-  const [
-    openProvideCollateralDialog,
-    provideCollateralDialogElement,
-  ] = useProvideCollateralDialog();
+  const [openProvideCollateralDialog, provideCollateralDialogElement] =
+    useProvideCollateralDialog();
 
-  const [
-    openRedeemCollateralDialog,
-    redeemCollateralDialogElement,
-  ] = useRedeemCollateralDialog();
+  const [openRedeemCollateralDialog, redeemCollateralDialogElement] =
+    useRedeemCollateralDialog();
 
   const collaterals = useMemo(
     () => _collaterals(borrowBorrower?.custodyBorrower, 1 as UST<number>),

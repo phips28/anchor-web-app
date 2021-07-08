@@ -73,10 +73,8 @@ function MintBase({ className }: MintProps) {
     () => bAssetCurrencies[0],
   );
 
-  const [
-    selectedValidator,
-    setSelectedValidator,
-  ] = useState<StakingValidator | null>(null);
+  const [selectedValidator, setSelectedValidator] =
+    useState<StakingValidator | null>(null);
 
   // ---------------------------------------------
   // queries
@@ -85,17 +83,16 @@ function MintBase({ className }: MintProps) {
 
   const { data: { whitelistedValidators } = {} } = useBondValidators();
 
-  const {
-    data: { state: exchangeRate, parameters } = {},
-  } = useBondBLunaExchangeRateQuery();
+  const { data: { state: exchangeRate, parameters } = {} } =
+    useBondBLunaExchangeRateQuery();
 
   // ---------------------------------------------
   // logics
   // ---------------------------------------------
-  const pegRecoveryFee = useMemo(() => pegRecovery(exchangeRate, parameters), [
-    exchangeRate,
-    parameters,
-  ]);
+  const pegRecoveryFee = useMemo(
+    () => pegRecovery(exchangeRate, parameters),
+    [exchangeRate, parameters],
+  );
 
   const invalidTxFee = useMemo(
     () => !!connectedWallet && validateTxFee(bank, fixedGas),

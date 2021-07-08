@@ -154,44 +154,39 @@ interface Option {
   maxSpread?: string;
 }
 
-export const fabricatebBuy = ({
-  address,
-  amount,
-  to,
-  beliefPrice,
-  maxSpread,
-  denom,
-}: Option) => (addressProvider: AddressProvider): MsgExecuteContract[] => {
-  validateInput([
-    validateAddress(address),
-    validateIsNumber(amount),
-    validateIsGreaterThanZero(+amount),
-  ]);
+export const fabricatebBuy =
+  ({ address, amount, to, beliefPrice, maxSpread, denom }: Option) =>
+  (addressProvider: AddressProvider): MsgExecuteContract[] => {
+    validateInput([
+      validateAddress(address),
+      validateIsNumber(amount),
+      validateIsGreaterThanZero(+amount),
+    ]);
 
-  const coins = new Coins([
-    new Coin(denom, new Int(new Dec(amount).mul(1000000)).toString()),
-  ]);
-  const pairAddress = addressProvider.terraswapAncUstPair();
-  return [
-    new MsgExecuteContract(
-      address,
-      pairAddress,
-      {
-        swap: {
-          offer_asset: {
-            info: {
-              native_token: {
-                denom: denom,
+    const coins = new Coins([
+      new Coin(denom, new Int(new Dec(amount).mul(1000000)).toString()),
+    ]);
+    const pairAddress = addressProvider.terraswapAncUstPair();
+    return [
+      new MsgExecuteContract(
+        address,
+        pairAddress,
+        {
+          swap: {
+            offer_asset: {
+              info: {
+                native_token: {
+                  denom: denom,
+                },
               },
+              amount: new Int(new Dec(amount).mul(1000000)).toString(),
             },
-            amount: new Int(new Dec(amount).mul(1000000)).toString(),
+            belief_price: beliefPrice,
+            max_spread: maxSpread,
+            to: to,
           },
-          belief_price: beliefPrice,
-          max_spread: maxSpread,
-          to: to,
         },
-      },
-      coins,
-    ),
-  ];
-};
+        coins,
+      ),
+    ];
+  };

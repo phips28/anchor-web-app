@@ -22,17 +22,15 @@ export function PollCreateModifyANCDistribution() {
   // ---------------------------------------------
   const { contractAddress: address } = useAnchorWebapp();
 
-  const {
-    data: { distributionModelConfig } = {},
-  } = useGovDistributionModelUpdateConfigQuery();
+  const { data: { distributionModelConfig } = {} } =
+    useGovDistributionModelUpdateConfigQuery();
 
   // ---------------------------------------------
   // states
   // ---------------------------------------------
   const [borrowerEmissionCap, setBorrowerEmissionCap] = useState<string>('');
-  const [borrowerEmissionFloor, setBorrowerEmissionFloor] = useState<string>(
-    '',
-  );
+  const [borrowerEmissionFloor, setBorrowerEmissionFloor] =
+    useState<string>('');
   const [incrementMultiplier, setIncrementMultiplier] = useState<string>('');
   const [decrementMultiplier, setDecrementMultiplier] = useState<string>('');
 
@@ -133,7 +131,8 @@ export function PollCreateModifyANCDistribution() {
       incrementMultiplier: string,
       decrementMultiplier: string,
     ): ExecuteMsg[] => {
-      const distributionModelConfig: moneyMarket.distributionModel.UpdateConfig['update_config'] = {};
+      const distributionModelConfig: moneyMarket.distributionModel.UpdateConfig['update_config'] =
+        {};
 
       if (borrowerEmissionCap.length > 0) {
         distributionModelConfig['emission_cap'] = formatExecuteMsgNumber(
@@ -148,15 +147,13 @@ export function PollCreateModifyANCDistribution() {
       }
 
       if (incrementMultiplier.length > 0) {
-        distributionModelConfig[
-          'increment_multiplier'
-        ] = formatExecuteMsgNumber(incrementMultiplier) as Rate;
+        distributionModelConfig['increment_multiplier'] =
+          formatExecuteMsgNumber(incrementMultiplier) as Rate;
       }
 
       if (decrementMultiplier.length > 0) {
-        distributionModelConfig[
-          'decrement_multiplier'
-        ] = formatExecuteMsgNumber(decrementMultiplier) as Rate;
+        distributionModelConfig['decrement_multiplier'] =
+          formatExecuteMsgNumber(decrementMultiplier) as Rate;
       }
 
       const msgs: Omit<ExecuteMsg, 'order'>[] = [];

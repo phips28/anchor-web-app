@@ -126,16 +126,15 @@ const walletConnectChainIds: Record<number, NetworkInfo> = {
 };
 
 export function AppProviders({ children }: { children: ReactNode }) {
-  const [
-    openReadonlyWalletSelector,
-    readonlyWalletSelectorElement,
-  ] = useReadonlyWalletDialog();
+  const [openReadonlyWalletSelector, readonlyWalletSelectorElement] =
+    useReadonlyWalletDialog();
 
   const [_openRequestReload, requestReloadElement] = useRequestReloadDialog();
 
-  const openRequestReload = useCallback(() => _openRequestReload({}), [
-    _openRequestReload,
-  ]);
+  const openRequestReload = useCallback(
+    () => _openRequestReload({}),
+    [_openRequestReload],
+  );
 
   const createReadonlyWalletSession = useCallback(
     (networks: NetworkInfo[]): Promise<ReadonlyWalletSession | null> => {

@@ -68,9 +68,8 @@ function ComponentBase({
 
   const bank = useBank();
 
-  const {
-    data: { userGovStakingInfo } = {},
-  } = useRewardsAncGovernanceRewardsQuery();
+  const { data: { userGovStakingInfo } = {} } =
+    useRewardsAncGovernanceRewardsQuery();
 
   const canIVote = useGovVoteAvailableQuery(pollId);
 

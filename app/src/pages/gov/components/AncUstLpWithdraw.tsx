@@ -51,9 +51,8 @@ export function AncUstLpWithdraw() {
   // ---------------------------------------------
   const [lpAmount, setLpAmount] = useState<AncUstLP>('' as AncUstLP);
 
-  const [simulation, setSimulation] = useState<AncUstLpSimulation<Big> | null>(
-    null,
-  );
+  const [simulation, setSimulation] =
+    useState<AncUstLpSimulation<Big> | null>(null);
 
   // ---------------------------------------------
   // queries

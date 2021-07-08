@@ -2,9 +2,8 @@ import { useMemo } from 'react';
 import { useRewardsAncGovernanceRewardsQuery } from '../rewards/ancGovernanceRewards';
 
 export function useGovVoteAvailableQuery(pollId: number | undefined): boolean {
-  const {
-    data: { userGovStakingInfo } = {},
-  } = useRewardsAncGovernanceRewardsQuery();
+  const { data: { userGovStakingInfo } = {} } =
+    useRewardsAncGovernanceRewardsQuery();
 
   return useMemo(() => {
     if (!pollId || !userGovStakingInfo) return false;

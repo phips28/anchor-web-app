@@ -48,9 +48,8 @@ function ClaimUstBorrowBase({ className }: ClaimUstBorrowProps) {
   // ---------------------------------------------
   const bank = useBank();
 
-  const {
-    data: { borrowerInfo, userANCBalance } = {},
-  } = useRewardsClaimableUstBorrowRewardsQuery();
+  const { data: { borrowerInfo, userANCBalance } = {} } =
+    useRewardsClaimableUstBorrowRewardsQuery();
 
   // ---------------------------------------------
   // logics

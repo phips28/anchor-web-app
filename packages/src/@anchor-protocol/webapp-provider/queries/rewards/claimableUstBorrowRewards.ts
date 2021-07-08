@@ -68,12 +68,8 @@ const queryFn = ({
 export function useRewardsClaimableUstBorrowRewardsQuery(): UseQueryResult<
   RewardsClaimableUstBorrowRewardsData | undefined
 > {
-  const {
-    mantleFetch,
-    mantleEndpoint,
-    lastSyncedHeight,
-    queryErrorReporter,
-  } = useTerraWebapp();
+  const { mantleFetch, mantleEndpoint, lastSyncedHeight, queryErrorReporter } =
+    useTerraWebapp();
 
   const connectedWallet = useConnectedWallet();
 

@@ -46,9 +46,8 @@ function OverviewBase({ className }: OverviewProps) {
 
   const { data: { govRewards, lpRewards } = {} } = useBorrowAPYQuery();
 
-  const {
-    data: { anchorLpRewards: apyLPRewards } = {},
-  } = useRewardsAnchorLpRewardsQuery();
+  const { data: { anchorLpRewards: apyLPRewards } = {} } =
+    useRewardsAnchorLpRewardsQuery();
 
   const history = useHistory();
 
@@ -59,20 +58,18 @@ function OverviewBase({ className }: OverviewProps) {
   const { data: { ancBalance: communityANCBalance } = {} } = useAncBalanceQuery(
     contractAddress.anchorToken.community,
   );
-  const {
-    data: { ancBalance: distributorANCBalance } = {},
-  } = useAncBalanceQuery(contractAddress.anchorToken.distributor);
+  const { data: { ancBalance: distributorANCBalance } = {} } =
+    useAncBalanceQuery(contractAddress.anchorToken.distributor);
   const { data: { ancBalance: lpStakingANCBalance } = {} } = useAncBalanceQuery(
     contractAddress.anchorToken.staking,
   );
   const { data: { ancBalance: airdropANCBalance } = {} } = useAncBalanceQuery(
     'terra146ahqn6d3qgdvmj8cj96hh03dzmeedhsf0kxqm' as HumanAddr,
   );
-  const {
-    data: { ancBalance: investorTeamLockANCBalance } = {},
-  } = useAncBalanceQuery(
-    'terra1dp0taj85ruc299rkdvzp4z5pfg6z6swaed74e6' as HumanAddr,
-  );
+  const { data: { ancBalance: investorTeamLockANCBalance } = {} } =
+    useAncBalanceQuery(
+      'terra1dp0taj85ruc299rkdvzp4z5pfg6z6swaed74e6' as HumanAddr,
+    );
   const { data: { govState, govConfig } = {} } = useGovStateQuery();
 
   const { data: { lpStakingState } = {} } = useAncLpStakingStateQuery();

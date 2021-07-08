@@ -49,13 +49,11 @@ function ClaimAncUstLpBase({ className }: ClaimAncUstLpProps) {
   // ---------------------------------------------
   const bank = useBank();
 
-  const {
-    data: { userANCBalance } = {},
-  } = useRewardsClaimableUstBorrowRewardsQuery();
+  const { data: { userANCBalance } = {} } =
+    useRewardsClaimableUstBorrowRewardsQuery();
 
-  const {
-    data: { lPStakerInfo: userLPStakingInfo } = {},
-  } = useRewardsClaimableAncUstLpRewardsQuery();
+  const { data: { lPStakerInfo: userLPStakingInfo } = {} } =
+    useRewardsClaimableAncUstLpRewardsQuery();
 
   // ---------------------------------------------
   // logics

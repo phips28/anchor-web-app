@@ -115,9 +115,8 @@ export async function bondWithdrawableAmountQuery({
     withdrawableAmountRawData.unbondedRequests.Result,
   );
 
-  const withdrawableUnbonded: bluna.hub.WithdrawableUnbondedResponse = JSON.parse(
-    withdrawableAmountRawData.withdrawableUnbonded.Result,
-  );
+  const withdrawableUnbonded: bluna.hub.WithdrawableUnbondedResponse =
+    JSON.parse(withdrawableAmountRawData.withdrawableUnbonded.Result);
 
   const unbondedRequestsStartFrom: number =
     unbondedRequests.requests.length > 0
@@ -128,7 +127,8 @@ export async function bondWithdrawableAmountQuery({
       : 0;
 
   if (unbondedRequestsStartFrom > 0) {
-    variables.allHistoryQuery.all_history.start_from = unbondedRequestsStartFrom;
+    variables.allHistoryQuery.all_history.start_from =
+      unbondedRequestsStartFrom;
 
     const withdrawHistoryRawData = await mantleFetch<
       BondWithdrawHistoryRawVariables,

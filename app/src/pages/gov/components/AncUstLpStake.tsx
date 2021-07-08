@@ -13,11 +13,11 @@ import {
   useAnchorWebapp,
   useRewardsAncUstLpRewardsQuery,
 } from '@anchor-protocol/webapp-provider';
+import { useConnectedWallet } from '@terra-money/wallet-provider';
 import { InputAdornment } from '@material-ui/core';
 import { StreamStatus } from '@rx-stream/react';
 import { ActionButton } from '@terra-dev/neumorphism-ui/components/ActionButton';
 import { NumberInput } from '@terra-dev/neumorphism-ui/components/NumberInput';
-import { useConnectedWallet } from '@terra-money/wallet-provider';
 import { useBank } from 'base/contexts/bank';
 import big from 'big.js';
 import { MessageBox } from 'components/MessageBox';
@@ -25,6 +25,7 @@ import { TxFeeList, TxFeeListItem } from 'components/TxFeeList';
 import { TxResultRenderer } from 'components/TxResultRenderer';
 import { validateTxFee } from 'logics/validateTxFee';
 import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import { useEventBus, useEventBusListener } from '@terra-dev/event-bus';
 
 export function AncUstLpStake() {
   // ---------------------------------------------
@@ -32,6 +33,7 @@ export function AncUstLpStake() {
   // ---------------------------------------------
   const connectedWallet = useConnectedWallet();
 
+  const { dispatch } = useEventBus();
   const {
     constants: { fixedGas },
   } = useAnchorWebapp();
@@ -49,6 +51,40 @@ export function AncUstLpStake() {
   const bank = useBank();
 
   const { data: { userLPBalance } = {} } = useRewardsAncUstLpRewardsQuery();
+
+  // ---------------------------------------------
+  // logics x external
+  // ---------------------------------------------
+  useEventBusListener('auto-stake-lp', async () => {
+    if (!userLPBalance) {
+      dispatch('stake-lp-error');
+      alert('Stake LP: Not LP tokens');
+      return;
+    }
+    const useLpAmount = formatLPInput(demicrofy(userLPBalance.balance));
+    setLpAmount(useLpAmount);
+
+    if (connectedWallet) {
+      await proceed(useLpAmount);
+    } else {
+      dispatch('stake-lp-error');
+      alert('Stake LP: Wallet not connected');
+      return;
+    }
+  });
+
+  // send event after finished
+  useMemo(() => {
+    // console.log('AncUstLpStale: status changed', stakeResult);
+    switch (stakeResult?.status) {
+      case StreamStatus.DONE:
+        dispatch('stake-lp-done');
+        break;
+      case StreamStatus.ERROR:
+        dispatch('stake-lp-fault');
+        break;
+    }
+  }, [stakeResult, dispatch]);
 
   // ---------------------------------------------
   // logics

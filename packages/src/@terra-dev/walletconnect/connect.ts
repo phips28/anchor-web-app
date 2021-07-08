@@ -72,11 +72,10 @@ export function connect(
 ): WalletConnectController {
   let connector: Connector | null = null;
 
-  let sessionSubject: BehaviorSubject<WalletConnectSession> = new BehaviorSubject<WalletConnectSession>(
-    {
+  let sessionSubject: BehaviorSubject<WalletConnectSession> =
+    new BehaviorSubject<WalletConnectSession>({
       status: WalletConnectSessionStatus.DISCONNECTED,
-    },
-  );
+    });
 
   const qrcodeModal =
     options.connectorOpts?.qrcodeModal ?? new TerraWalletconnectQrcodeModal();

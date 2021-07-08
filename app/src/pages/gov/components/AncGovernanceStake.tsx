@@ -48,9 +48,8 @@ export function AncGovernanceStake() {
   // ---------------------------------------------
   const bank = useBank();
 
-  const {
-    data: { userANCBalance } = {},
-  } = useRewardsAncGovernanceRewardsQuery();
+  const { data: { userANCBalance } = {} } =
+    useRewardsAncGovernanceRewardsQuery();
 
   // ---------------------------------------------
   // logics

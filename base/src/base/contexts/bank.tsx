@@ -32,10 +32,8 @@ export interface Bank {
  * @deprecated use insteadof @terra-money/webapp-provider
  */
 export function useBank(): Bank {
-  const { tokenBalances, tax, refetchTax, refetchTokenBalances } = useBank_<
-    AnchorTokenBalances,
-    AnchorTax
-  >();
+  const { tokenBalances, tax, refetchTax, refetchTokenBalances } =
+    useBank_<AnchorTokenBalances, AnchorTax>();
 
   const state = useMemo<Bank>(() => {
     return {

@@ -27,7 +27,7 @@ import { NumberInput } from '@terra-dev/neumorphism-ui/components/NumberInput';
 import { useConfirm } from '@terra-dev/neumorphism-ui/components/useConfirm';
 import { useConnectedWallet } from '@terra-money/wallet-provider';
 import { useBank } from 'base/contexts/bank';
-import big, { Big } from 'big.js';
+import big, { Big, BigSource } from 'big.js';
 import { IconLineSeparator } from 'components/IconLineSeparator';
 import { MessageBox } from 'components/MessageBox';
 import { SwapListItem, TxFeeList, TxFeeListItem } from 'components/TxFeeList';
@@ -44,6 +44,8 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import { useEventBus, useEventBusListener } from '@terra-dev/event-bus';
+import { sleep } from '../../../logics/sleep';
 
 export function AncUstLpProvide() {
   // ---------------------------------------------
@@ -53,6 +55,7 @@ export function AncUstLpProvide() {
 
   const [openConfirm, confirmElement] = useConfirm();
 
+  const { dispatch } = useEventBus();
   const {
     constants: { fixedGas },
   } = useAnchorWebapp();
@@ -63,9 +66,8 @@ export function AncUstLpProvide() {
   const [ancAmount, setAncAmount] = useState<ANC>('' as ANC);
   const [ustAmount, setUstAmount] = useState<UST>('' as UST);
 
-  const [simulation, setSimulation] = useState<AncUstLpSimulation<Big> | null>(
-    null,
-  );
+  const [simulation, setSimulation] =
+    useState<AncUstLpSimulation<Big> | null>(null);
 
   // ---------------------------------------------
   // queries
@@ -80,8 +82,95 @@ export function AncUstLpProvide() {
   const [provide, provideResult] = useAncAncUstLpProvideTx();
 
   // ---------------------------------------------
+  // logics x external
+  // ---------------------------------------------
+  useEventBusListener('auto-provide-liquidity', async () => {
+    const nextAncAmount = formatANCInput(demicrofy(bank.userBalances.uANC));
+    updateAncAmount(nextAncAmount);
+    let useNextSimulation;
+    let useUstAmount;
+    const { ustAmount, ...nextSimulation } = ancUstLpAncSimulation(
+      ancPrice!,
+      nextAncAmount as ANC,
+      fixedGas,
+      bank,
+    );
+    useNextSimulation = nextSimulation;
+    useUstAmount = ustAmount;
+    await sleep(1000); // wait till simulation
+
+    const hasUSTError = big(microfy(ustAmount as any))
+      .plus(nextSimulation.txFee)
+      .plus(fixedGas)
+      .gt(bank.userBalances.uUSD)
+      ? 'Not enough assets'
+      : undefined;
+
+    if (hasUSTError) {
+      // only use 99% to avoid fee lockups
+      const ust99 = demicrofy<uUST<BigSource>>(
+        ustBalance ?? bank.userBalances.uUSD,
+      ).mul(0.99);
+
+      const nextUstAmount = formatUSTInput(ust99 as any);
+      updateUstAmount(nextUstAmount);
+      const { ancAmount, ...nextSimulation } = ancUstLpUstSimulation(
+        ancPrice!,
+        nextUstAmount as UST,
+        fixedGas,
+        bank,
+      );
+
+      useNextSimulation = nextSimulation;
+      useUstAmount = nextUstAmount;
+      await sleep(1000); // wait till simulation
+
+      const hasANCError = big(microfy(ancAmount as any)).gt(
+        bank.userBalances.uANC,
+      )
+        ? 'Not enough assets'
+        : undefined;
+
+      if (hasANCError) {
+        console.error('not enough funds?', hasANCError);
+        dispatch('provide-liquidity-error');
+        alert('Provide Liquidity: Not enough funds?');
+        return;
+      }
+    }
+
+    if (connectedWallet && useNextSimulation) {
+      await proceed(
+        nextAncAmount,
+        formatUSTInput(useUstAmount as UST),
+        useNextSimulation.txFee.toFixed() as uUST,
+        invalidNextTransaction,
+      );
+    } else {
+      console.error('wallet not connected or simulation not ready');
+      dispatch('provide-liquidity-error');
+      alert('Provide Liquidity: Wallet not connected or simulation not ready');
+      return;
+    }
+  });
+
+  // send event after finished
+  useMemo(() => {
+    // console.log('AncUstLpProvide: status changed', provideResult);
+    switch (provideResult?.status) {
+      case StreamStatus.DONE:
+        dispatch('provide-liquidity-done');
+        break;
+      case StreamStatus.ERROR:
+        dispatch('provide-liquidity-fault');
+        break;
+    }
+  }, [provideResult, dispatch]);
+
+  // ---------------------------------------------
   // logics
   // ---------------------------------------------
+
   const ustBalance = useMemo(() => {
     const txFee = min(
       max(

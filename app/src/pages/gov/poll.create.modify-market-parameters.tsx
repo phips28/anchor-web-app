@@ -25,10 +25,8 @@ export function PollCreateModifyMarketParameters() {
   // ---------------------------------------------
   const [targetDepositRate, setTargetDepositRate] = useState<string>('');
   const [thresholdDepositRate, setThresholdDepositRate] = useState<string>('');
-  const [
-    bufferDistributionFactor,
-    setBufferDistributionFactor,
-  ] = useState<string>('');
+  const [bufferDistributionFactor, setBufferDistributionFactor] =
+    useState<string>('');
   const [maxBorrowFactor, setMaxBorrowFactor] = useState<string>('');
   const [validPriceTimeframe, setValidPriceTimeframe] = useState<string>('');
 
@@ -134,8 +132,10 @@ export function PollCreateModifyMarketParameters() {
       maxBorrowFactor: string,
       validPriceTimeframe: string,
     ): ExecuteMsg[] => {
-      const overseerUpdateConfig: moneyMarket.overseer.UpdateConfig['update_config'] = {};
-      const marketUpdateConfig: moneyMarket.market.UpdateConfig['update_config'] = {};
+      const overseerUpdateConfig: moneyMarket.overseer.UpdateConfig['update_config'] =
+        {};
+      const marketUpdateConfig: moneyMarket.market.UpdateConfig['update_config'] =
+        {};
 
       if (targetDepositRate.length > 0) {
         overseerUpdateConfig['target_deposit_rate'] = formatExecuteMsgNumber(
@@ -150,11 +150,10 @@ export function PollCreateModifyMarketParameters() {
       }
 
       if (bufferDistributionFactor.length > 0) {
-        overseerUpdateConfig[
-          'buffer_distribution_factor'
-        ] = formatExecuteMsgNumber(
-          big(bufferDistributionFactor).div(100),
-        ) as Rate;
+        overseerUpdateConfig['buffer_distribution_factor'] =
+          formatExecuteMsgNumber(
+            big(bufferDistributionFactor).div(100),
+          ) as Rate;
       }
 
       if (validPriceTimeframe.length > 0) {

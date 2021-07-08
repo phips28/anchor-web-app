@@ -36,9 +36,10 @@ import styled from 'styled-components';
 
 export interface RewardsProps {
   className?: string;
+  hideClaimAllBtn?: boolean;
 }
 
-export function RewardsBase({ className }: RewardsProps) {
+export function RewardsBase({ className, hideClaimAllBtn }: RewardsProps) {
   // ---------------------------------------------
   // queries
   // ---------------------------------------------
@@ -50,17 +51,14 @@ export function RewardsBase({ className }: RewardsProps) {
     data: { lPBalance: userLPBalance, lPStakerInfo: userLPStakingInfo } = {},
   } = useRewardsClaimableAncUstLpRewardsQuery();
 
-  const {
-    data: { userANCBalance, userGovStakingInfo } = {},
-  } = useRewardsAncGovernanceRewardsQuery();
+  const { data: { userANCBalance, userGovStakingInfo } = {} } =
+    useRewardsAncGovernanceRewardsQuery();
 
-  const {
-    data: { borrowerInfo, marketState } = {},
-  } = useRewardsClaimableUstBorrowRewardsQuery();
+  const { data: { borrowerInfo, marketState } = {} } =
+    useRewardsClaimableUstBorrowRewardsQuery();
 
-  const {
-    data: { govRewards, lpRewards, borrowerDistributionAPYs } = {},
-  } = useBorrowAPYQuery();
+  const { data: { govRewards, lpRewards, borrowerDistributionAPYs } = {} } =
+    useBorrowAPYQuery();
 
   // ---------------------------------------------
   // logics
@@ -153,11 +151,13 @@ export function RewardsBase({ className }: RewardsProps) {
         <div>
           <h2>Rewards</h2>
         </div>
-        <div>
-          <ActionButton component={Link} to={`/${govPathname}/claim/all`}>
-            Claim All Rewards
-          </ActionButton>
-        </div>
+        {!hideClaimAllBtn && (
+          <div>
+            <ActionButton component={Link} to={`/${govPathname}/claim/all`}>
+              Claim All Rewards
+            </ActionButton>
+          </div>
+        )}
       </SubHeader>
 
       <Section>

@@ -52,9 +52,8 @@ export function AncGovernanceUnstake() {
   // ---------------------------------------------
   const bank = useBank();
 
-  const {
-    data: { userGovStakingInfo } = {},
-  } = useRewardsAncGovernanceRewardsQuery();
+  const { data: { userGovStakingInfo } = {} } =
+    useRewardsAncGovernanceRewardsQuery();
 
   const { data: { ancBalance: govANCBalance } = {} } = useAncBalanceQuery(
     contractAddress.anchorToken.gov,
